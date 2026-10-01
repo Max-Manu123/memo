@@ -85,7 +85,7 @@ function ProgressRing({ value,max }:{value:number;max:number}) {
 }
 
 export default function Home() {
-  const [locale,setLocale]=useState<Locale>("en"), [theme,setTheme]=useState<Theme>("light");
+  const [locale,setLocale]=useState<Locale>("pt"), [theme,setTheme]=useState<Theme>("light");
   const [onboarded,setOnboarded]=useState(false), [step,setStep]=useState(1), [goal,setGoal]=useState<Goal>("maintain");
   const [view,setView]=useState<View>("home"), [showLogger,setShowLogger]=useState(false);
   const [mealText,setMealText]=useState(""), [analyzing,setAnalyzing]=useState(false), [result,setResult]=useState(false);
@@ -94,12 +94,14 @@ export default function Home() {
   const [meals,setMeals]=useState<Meal[]>(demoMeals);
   const t=copy[locale];
 
-  useEffect(()=>{const raw=localStorage.getItem("memo-demo");if(raw){try{const d=JSON.parse(raw);setOnboarded(!!d.onboarded);setGoal(d.goal??"maintain");setLocale(d.locale??"en");setTheme(d.theme??"light")}catch{}}},[]);
+  useEffect(()=>{const raw=localStorage.getItem("memo-demo");if(raw){try{const d=JSON.parse(raw);setOnboarded(!!d.onboarded);setGoal(d.goal??"maintain");setLocale(d.locale??"pt");setTheme(d.theme??"light")}catch{}}},[]);
   useEffect(()=>{document.documentElement.dataset.theme=theme;localStorage.setItem("memo-demo",JSON.stringify({onboarded,goal,locale,theme}))},[onboarded,goal,locale,theme]);
 
   const calories=meals.reduce((s,m)=>s+m.calories,0), protein=meals.reduce((s,m)=>s+m.protein,0);
   const carbs=meals.reduce((s,m)=>s+m.carbs,0), fat=meals.reduce((s,m)=>s+m.fat,0);
   const target=goal==="lose"?1900:goal==="gain"?2500:2200;
+  const remainingCalories=Math.max(0,target-calories);
+  const formatNumber=(n:number)=>n.toLocaleString(locale==="pt"?"pt-PT":"en-US");
   const learned=useMemo(()=>meals.slice(0,3),[meals]);
 
   function openLogger(mode:"describe"|"photo"|"usual"="describe"){setLoggerMode(mode);setResult(false);setPhotoName("");setMealText("");setShowLogger(true)}
@@ -143,7 +145,7 @@ export default function Home() {
 
       {view==="home" && <div className="page-wrap">
         <section className="welcome-row"><div><span className="muted-label">{t.today} · OCT 1</span><h1>{t.hello}, Alex.</h1><p>{t.subtitle}</p></div><button className="primary-button desktop-add" onClick={()=>openLogger()}><Icon name="plus" size={19}/>{t.addMeal}</button></section>
-        <section className="dashboard-grid"><div className="card calorie-card"><div className="card-heading"><div><span className="muted-label">{t.calories}</span><h2>{calories.toLocaleString()} <small>/ {target.toLocaleString()}</small></h2></div><ProgressRing value={calories} max={target}/></div>
+        <section className="dashboard-grid"><div className="card calorie-card"><div className="card-heading"><div><span className="muted-label">{t.calories}</span><h2>{formatNumber(calories)} <small>/ {formatNumber(target)}</small></h2><span className="calorie-remaining">{formatNumber(remainingCalories)} kcal {t.remaining}</span></div><ProgressRing value={calories} max={target}/></div>
           <div className="macro-row"><div><span className="macro-dot"/><span>{t.protein}</span><b>{protein}g</b></div><div><span className="macro-dot carbs"/><span>{t.carbs}</span><b>{carbs}g</b></div><div><span className="macro-dot fat"/><span>{t.fat}</span><b>{fat}g</b></div></div></div>
           <div className="card memory-card"><div className="memory-icon"><Icon name="spark" size={21}/></div><span className="muted-label">{t.memory}</span><h3>Less logging. More knowing.</h3><p>{t.memoryText}</p><button className="text-button" onClick={()=>setView("history")}>{t.seeAll}<Icon name="arrow" size={15}/></button></div>
         </section>
@@ -151,7 +153,7 @@ export default function Home() {
           <div className="usual-grid">{learned.map(m=><button className="usual-card" key={m.id} onClick={()=>startUsual(m)}><div className="meal-symbol">{m.type==="Breakfast"?"☀":m.type==="Lunch"?"◒":"◉"}</div><div><b>{m.name}</b><span>{m.calories} kcal · {m.protein}g protein</span></div><Icon name="plus" size={17}/></button>)}</div>
         </section>
         <section className="section"><div className="section-heading"><div><span className="muted-label">{t.recent}</span><h2>{t.today}</h2></div><button className="text-button" onClick={()=>setView("history")}>{t.seeAll}<Icon name="arrow" size={15}/></button></div>
-          <div className="meal-list">{meals.slice(0,4).map(m=><div className="meal-row" key={m.id}><div className="meal-symbol soft">◒</div><div className="meal-main"><b>{m.name}</b><span>{m.time} · {m.note}</span></div><div className="meal-kcal"><b>{m.calories}</b><span>kcal</span></div><Icon name="chevron" size={16}/></div>)}</div>
+          <div className="meal-list">{meals.slice(0,4).map(m=><div className="meal-row" key={m.id}><div className="meal-symbol soft">{m.type==="Breakfast"?"☀":m.type==="Lunch"?"◒":m.type==="Snack"?"◉":"◍"}</div><div className="meal-main"><b>{m.name}</b><span>{m.time} · {m.note}</span></div><div className="meal-kcal"><b>{m.calories}</b><span>kcal</span></div><Icon name="chevron" size={16}/></div>)}</div>
         </section>
       </div>}
 

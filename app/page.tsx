@@ -108,7 +108,9 @@ export default function Home() {
   const formatNumber=(n:number)=>n.toLocaleString(locale==="pt"?"pt-PT":"en-US");
   const learned=useMemo(()=>meals.slice(0,3),[meals]);
 
-  function validateOnboarding(){const name=profile.name.trim(),age=Number(profile.age),weight=Number(profile.weight),height=Number(profile.height);if(name.length<2){setOnboardingError(t.invalidName);return false}if(!Number.isFinite(age)||age<13||age>100){setOnboardingError(t.invalidAge);return false}if(!Number.isFinite(weight)||weight<30||weight>300){setOnboardingError(t.invalidWeight);return false}if(!Number.isFinite(height)||height<100||height>230){setOnboardingError(t.invalidHeight);return false}setOnboardingError("");return true}\n\n  function openLogger(mode:"describe"|"photo"|"usual"="describe"){setLoggerMode(mode);setResult(false);setPhotoName("");setMealText("");setMealType("Dinner");setPortion("normal");setAnalyzing(false);setShowLogger(true)}
+  function validateOnboarding(){const name=profile.name.trim(),age=Number(profile.age),weight=Number(profile.weight),height=Number(profile.height);if(name.length<2){setOnboardingError(t.invalidName);return false}if(!Number.isFinite(age)||age<13||age>100){setOnboardingError(t.invalidAge);return false}if(!Number.isFinite(weight)||weight<30||weight>300){setOnboardingError(t.invalidWeight);return false}if(!Number.isFinite(height)||height<100||height>230){setOnboardingError(t.invalidHeight);return false}setOnboardingError("");return true}
+
+  function openLogger(mode:"describe"|"photo"|"usual"="describe"){setLoggerMode(mode);setResult(false);setPhotoName("");setMealText("");setMealType("Dinner");setPortion("normal");setAnalyzing(false);setShowLogger(true)}
   function analyze(){if(loggerMode==="photo"&&!photoName)return;if(loggerMode==="describe"&&!mealText.trim())return;setAnalyzing(true);setTimeout(()=>{setAnalyzing(false);setResult(true)},650)}
   function confirm(){
     const baseName=mealText.trim()||photoName||(locale==="pt"?"Refeição por foto":"Photo meal"); const adjusted=portion==="small"?0.82:portion==="large"?1.2:1;

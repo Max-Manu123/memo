@@ -89,6 +89,8 @@ export default function Home() {
   const [onboarded,setOnboarded]=useState(false), [step,setStep]=useState(1), [goal,setGoal]=useState<Goal>("maintain");
   const [view,setView]=useState<View>("home"), [showLogger,setShowLogger]=useState(false);
   const [mealText,setMealText]=useState(""), [analyzing,setAnalyzing]=useState(false), [result,setResult]=useState(false);
+  const [loggerMode,setLoggerMode]=useState<"describe"|"photo"|"usual">("describe"), [mealType,setMealType]=useState<Meal["type"]>("Dinner");
+  const [portion,setPortion]=useState("normal"), [photoName,setPhotoName]=useState("");
   const [meals,setMeals]=useState<Meal[]>(demoMeals);
   const t=copy[locale];
 
@@ -100,12 +102,15 @@ export default function Home() {
   const target=goal==="lose"?1900:goal==="gain"?2500:2200;
   const learned=useMemo(()=>meals.slice(0,3),[meals]);
 
-  function analyze(){if(!mealText.trim())return;setAnalyzing(true);setTimeout(()=>{setAnalyzing(false);setResult(true)},700)}
+  function openLogger(mode:"describe"|"photo"|"usual"="describe"){setLoggerMode(mode);setResult(false);setPhotoName("");setMealText("");setShowLogger(true)}
+  function analyze(){if(loggerMode==="photo"&&!photoName)return;if(loggerMode==="describe"&&!mealText.trim())return;setAnalyzing(true);setTimeout(()=>{setAnalyzing(false);setResult(true)},650)}
   function confirm(){
-    setMeals(cur=>[{id:crypto.randomUUID(),name:mealText.trim(),time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),calories:575,protein:31,carbs:56,fat:18,note:"Learned from your correction",confidence:"Medium",type:"Dinner"},...cur]);
+    const baseName=mealText.trim()||photoName||"Photo meal"; const adjusted=portion==="small"?0.82:portion==="large"?1.2:1;
+    setMeals(cur=>[{id:crypto.randomUUID(),name:baseName,time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),calories:Math.round(575*adjusted),protein:Math.round(31*adjusted),carbs:Math.round(56*adjusted),fat:Math.round(18*adjusted),note:"Learned from your correction",confidence:"Medium",type:mealType},...cur]);
     setShowLogger(false);setMealText("");setResult(false);
   }
   function reset(){localStorage.removeItem("memo-demo");setOnboarded(false);setStep(1);setView("home");setMeals(demoMeals)}
+  function startUsual(m:Meal){setMealText(m.name);setMealType(m.type);setLoggerMode("usual");setResult(true);setShowLogger(true)}
 
   if(!onboarded) return <main className="onboarding-shell">
     <div className="brand-mark">M</div>
@@ -137,20 +142,20 @@ export default function Home() {
       </div></header>
 
       {view==="home" && <div className="page-wrap">
-        <section className="welcome-row"><div><span className="muted-label">{t.today} · OCT 1</span><h1>{t.hello}, Alex.</h1><p>{t.subtitle}</p></div><button className="primary-button desktop-add" onClick={()=>setShowLogger(true)}><Icon name="plus" size={19}/>{t.addMeal}</button></section>
+        <section className="welcome-row"><div><span className="muted-label">{t.today} · OCT 1</span><h1>{t.hello}, Alex.</h1><p>{t.subtitle}</p></div><button className="primary-button desktop-add" onClick={()=>openLogger()}><Icon name="plus" size={19}/>{t.addMeal}</button></section>
         <section className="dashboard-grid"><div className="card calorie-card"><div className="card-heading"><div><span className="muted-label">{t.calories}</span><h2>{calories.toLocaleString()} <small>/ {target.toLocaleString()}</small></h2></div><ProgressRing value={calories} max={target}/></div>
           <div className="macro-row"><div><span className="macro-dot"/><span>{t.protein}</span><b>{protein}g</b></div><div><span className="macro-dot carbs"/><span>{t.carbs}</span><b>{carbs}g</b></div><div><span className="macro-dot fat"/><span>{t.fat}</span><b>{fat}g</b></div></div></div>
           <div className="card memory-card"><div className="memory-icon"><Icon name="spark" size={21}/></div><span className="muted-label">{t.memory}</span><h3>Less logging. More knowing.</h3><p>{t.memoryText}</p><button className="text-button" onClick={()=>setView("history")}>{t.seeAll}<Icon name="arrow" size={15}/></button></div>
         </section>
         <section className="section"><div className="section-heading"><div><span className="muted-label">{t.usual}</span><h2>One-tap meals</h2></div><button className="text-button">{t.seeAll}<Icon name="chevron" size={15}/></button></div>
-          <div className="usual-grid">{learned.map(m=><button className="usual-card" key={m.id} onClick={()=>{setMealText(m.name);setShowLogger(true);setResult(true)}}><div className="meal-symbol">{m.type==="Breakfast"?"☀":m.type==="Lunch"?"◒":"◉"}</div><div><b>{m.name}</b><span>{m.calories} kcal · {m.protein}g protein</span></div><Icon name="plus" size={17}/></button>)}</div>
+          <div className="usual-grid">{learned.map(m=><button className="usual-card" key={m.id} onClick={()=>startUsual(m)}><div className="meal-symbol">{m.type==="Breakfast"?"☀":m.type==="Lunch"?"◒":"◉"}</div><div><b>{m.name}</b><span>{m.calories} kcal · {m.protein}g protein</span></div><Icon name="plus" size={17}/></button>)}</div>
         </section>
         <section className="section"><div className="section-heading"><div><span className="muted-label">{t.recent}</span><h2>{t.today}</h2></div><button className="text-button" onClick={()=>setView("history")}>{t.seeAll}<Icon name="arrow" size={15}/></button></div>
           <div className="meal-list">{meals.slice(0,4).map(m=><div className="meal-row" key={m.id}><div className="meal-symbol soft">◒</div><div className="meal-main"><b>{m.name}</b><span>{m.time} · {m.note}</span></div><div className="meal-kcal"><b>{m.calories}</b><span>kcal</span></div><Icon name="chevron" size={16}/></div>)}</div>
         </section>
       </div>}
 
-      {view==="history" && <div className="page-wrap"><section className="welcome-row compact"><div><span className="muted-label">MEMO / HISTORY</span><h1>{t.history}</h1><p>Your meals, corrections and learned patterns.</p></div><button className="primary-button" onClick={()=>setShowLogger(true)}><Icon name="plus" size={19}/>{t.addMeal}</button></section>
+      {view==="history" && <div className="page-wrap"><section className="welcome-row compact"><div><span className="muted-label">MEMO / HISTORY</span><h1>{t.history}</h1><p>Your meals, corrections and learned patterns.</p></div><button className="primary-button" onClick={()=>openLogger()}><Icon name="plus" size={19}/>{t.addMeal}</button></section>
         <div className="history-day"><div className="day-label">TODAY <span>{meals.length} meals</span></div>{meals.map(m=><div className="meal-row large" key={m.id}><div className="meal-symbol soft">◒</div><div className="meal-main"><b>{m.name}</b><span>{m.time} · {m.note}</span></div><div className="confidence">{m.confidence}<i/></div><div className="meal-kcal"><b>{m.calories}</b><span>kcal</span></div></div>)}</div>
       </div>}
 
@@ -168,18 +173,27 @@ export default function Home() {
     </main>
 
     <nav className="bottom-nav">{nav.map(([k,l,i])=><button key={k} className={view===k?"active":""} onClick={()=>setView(k)}><Icon name={i} size={20}/><span>{l}</span></button>)}</nav>
-    <button className="floating-add" onClick={()=>setShowLogger(true)}><Icon name="plus" size={23}/></button>
+    <button className="floating-add" onClick={()=>openLogger()}><Icon name="plus" size={23}/></button>
 
-    {showLogger && <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShowLogger(false)}}><div className="meal-modal">
-      <div className="modal-header"><div><span className="muted-label">MEMO / MEAL</span><h2>{result?t.result:t.logTitle}</h2></div><button className="icon-button" onClick={()=>setShowLogger(false)}><Icon name="close"/></button></div>
-      {!result ? <><p className="modal-copy">{t.logText}</p><textarea value={mealText} onChange={e=>setMealText(e.target.value)} placeholder={t.placeholder} autoFocus/>
-        <div className="modal-tip"><Icon name="spark" size={17}/><span>Memo gets better when you correct it.</span></div>
-        <button className="primary-button wide" disabled={analyzing||!mealText.trim()} onClick={analyze}>{analyzing?t.analyzing:t.analyze}<Icon name="arrow"/></button></>
-      : <><div className="estimate"><div><span className="muted-label">{t.calories}</span><strong>540–610</strong><span>kcal</span></div><div className="estimate-badge">{t.noPressure}</div></div>
-        <div className="estimate-grid"><div><span>{t.protein}</span><b>31g</b></div><div><span>{t.carbs}</span><b>56g</b></div><div><span>{t.fat}</span><b>18g</b></div></div>
-        <div className="uncertainty"><Icon name="info" size={17}/><div><b>{t.range}</b><p>Portion size is the main uncertainty. Correct it now and Memo will remember.</p></div></div>
-        <div className="modal-actions"><button className="secondary-button" onClick={()=>setResult(false)}>{t.edit}</button><button className="primary-button" onClick={confirm}>{t.confirm}<Icon name="check" size={18}/></button></div>
-        <div className="learned-banner"><Icon name="spark" size={17}/><div><b>{t.learned}</b><span>{t.learnedText}</span></div></div></>}
+    {showLogger && <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShowLogger(false)}}><div className="meal-modal meal-modal-rich">
+      <div className="modal-header"><div><span className="muted-label">MEMO / MEAL LOG</span><h2>{result?"Review your meal":"Add a meal"}</h2></div><button className="icon-button" onClick={()=>setShowLogger(false)}><Icon name="close"/></button></div>
+      {!result ? <>
+        <div className="logger-tabs"><button className={loggerMode==="describe"?"active":""} onClick={()=>setLoggerMode("describe")}>✍️ Describe</button><button className={loggerMode==="photo"?"active":""} onClick={()=>setLoggerMode("photo")}>📷 Photo</button><button className={loggerMode==="usual"?"active":""} onClick={()=>setLoggerMode("usual")}>⚡ Usual</button></div>
+        {loggerMode==="describe" && <><p className="modal-copy">Tell Memo what you ate in your own words. No need to search a food database.</p><textarea value={mealText} onChange={e=>setMealText(e.target.value)} placeholder="e.g. grilled chicken, 1 cup rice and beans" autoFocus/><div className="quick-examples"><button onClick={()=>setMealText("Grilled chicken, rice and beans")}>Chicken + rice</button><button onClick={()=>setMealText("Oatmeal, banana and peanut butter")}>Oatmeal + banana</button><button onClick={()=>setMealText("Greek yogurt and fruit")}>Yogurt + fruit</button></div></>}
+        {loggerMode==="photo" && <><p className="modal-copy">Add a photo of your meal. Image analysis is prepared for the real AI integration; the MVP keeps this step local.</p><label className="photo-drop"><input type="file" accept="image/*" capture="environment" onChange={e=>setPhotoName(e.target.files?.[0]?.name||"")}/><span className="photo-icon">📷</span><b>{photoName||"Add a meal photo"}</b><small>{photoName?"Photo ready to analyze":"Tap to take a photo or choose one"}</small></label></>}
+        {loggerMode==="usual" && <div className="usual-picker">{learned.map(m=><button key={m.id} onClick={()=>{setMealText(m.name);setMealType(m.type);setResult(true)}}><span className="meal-symbol">{m.type==="Breakfast"?"☀":m.type==="Lunch"?"◒":"◉"}</span><span><b>{m.name}</b><small>{m.calories} kcal · used before</small></span><Icon name="chevron" size={16}/></button>)}</div>}
+        <div className="logger-details"><label><span>Meal</span><select value={mealType} onChange={e=>setMealType(e.target.value as Meal["type"])}><option>Breakfast</option><option>Lunch</option><option>Snack</option><option>Dinner</option></select></label><label><span>Portion</span><select value={portion} onChange={e=>setPortion(e.target.value)}><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option></select></label></div>
+        <div className="modal-tip"><Icon name="spark" size={17}/><span>Memo learns from corrections, so you do not need perfect measurements.</span></div>
+        <button className="primary-button wide" disabled={analyzing||(loggerMode==="photo"?!photoName:loggerMode==="usual"?false:!mealText.trim())} onClick={analyze}>{analyzing?"Analyzing…":"Review estimate"}<Icon name="arrow"/></button>
+      </> : <>
+        <div className="review-source"><span className="source-pill">{loggerMode==="photo"?"📷 Photo":loggerMode==="usual"?"⚡ Usual meal":"✍️ Description"}</span><span className="confidence-pill">Medium confidence</span></div>
+        <div className="meal-preview-card"><div className="meal-symbol">{mealType==="Breakfast"?"☀":mealType==="Lunch"?"◒":mealType==="Snack"?"◉":"◍"}</div><div><b>{mealText||photoName||"Your meal"}</b><span>{mealType} · portion: {portion}</span></div><button className="text-button" onClick={()=>setResult(false)}>Edit</button></div>
+        <div className="estimate estimate-rich"><div><span className="muted-label">ESTIMATED ENERGY</span><strong>{portion==="small"?"450–510":portion==="large"?"650–730":"540–610"}</strong><span>kcal</span></div><div className="estimate-badge">Approximate</div></div>
+        <div className="estimate-grid"><div><span>Protein</span><b>{portion==="small"?"25":"31"}g</b></div><div><span>Carbs</span><b>{portion==="large"?"67":"56"}g</b></div><div><span>Fat</span><b>{portion==="small"?"15":"18"}g</b></div></div>
+        <div className="uncertainty"><Icon name="info" size={17}/><div><b>What could change this?</b><p>Portion size is the biggest uncertainty. Correct it and Memo can use that correction next time.</p></div></div>
+        <div className="correction-box"><b>Quick correction</b><div><button className={portion==="small"?"selected":""} onClick={()=>setPortion("small")}>Smaller</button><button className={portion==="normal"?"selected":""} onClick={()=>setPortion("normal")}>About right</button><button className={portion==="large"?"selected":""} onClick={()=>setPortion("large")}>Larger</button></div></div>
+        <div className="modal-actions"><button className="secondary-button" onClick={()=>setResult(false)}>Back</button><button className="primary-button" onClick={confirm}>Confirm & remember <Icon name="check" size={18}/></button></div>
+        <div className="learned-banner"><Icon name="spark" size={17}/><div><b>Memo will remember this</b><span>Next time, this meal can become a one-tap suggestion.</span></div></div>
+      </>}
     </div></div>}
-  </div>;
 }

@@ -93,7 +93,8 @@ export default function Home() {
   const [mealText,setMealText]=useState(""), [analyzing,setAnalyzing]=useState(false), [result,setResult]=useState(false);
   const [loggerMode,setLoggerMode]=useState<"describe"|"photo"|"usual">("describe"), [mealType,setMealType]=useState<Meal["type"]>("Dinner");
   const [portion,setPortion]=useState("normal"), [photoName,setPhotoName]=useState("");
-  const [meals,setMeals]=useState<Meal[]>(demoMeals);\n  const [profile,setProfile]=useState({name:"Alex",age:"24",weight:"72",height:"175"});
+  const [meals,setMeals]=useState<Meal[]>(demoMeals);
+  const [profile,setProfile]=useState({name:"Alex",age:"24",weight:"72",height:"175"});
   const t=copy[locale];
 
   useEffect(()=>{const raw=localStorage.getItem("memo-demo");if(raw){try{const d=JSON.parse(raw);setOnboarded(!!d.onboarded);setLandingSeen(!!d.landingSeen);setGoal(d.goal??"maintain");setLocale(d.locale??"pt");setTheme(d.theme??"light");setProfile(d.profile??{name:"Alex",age:"24",weight:"72",height:"175"});setMeals(Array.isArray(d.meals)&&d.meals.length?d.meals:demoMeals)}catch{}}},[]);

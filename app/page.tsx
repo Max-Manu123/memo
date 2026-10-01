@@ -196,4 +196,5 @@ export default function Home() {
         <div className="learned-banner"><Icon name="spark" size={17}/><div><b>Memo will remember this</b><span>Next time, this meal can become a one-tap suggestion.</span></div></div>
       </>}
     </div></div>}
+  </div>;
 }

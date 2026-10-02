@@ -1,11 +1,14 @@
 export type Goal = "lose" | "maintain" | "gain";
 
+export type MealSource = "text" | "photo" | "saved";
+export type ConfidenceLevel = "high" | "medium" | "low";
+
 export type MealAnalysis = {
   calories: { min: number; max: number };
   proteinGrams: number;
   carbsGrams: number;
   fatGrams: number;
-  confidence: "high" | "medium" | "low";
+  confidence: ConfidenceLevel;
   assumptions: string[];
 };
 
@@ -15,7 +18,7 @@ export type MealRecord = {
   name: string;
   loggedAt: string;
   analysis: MealAnalysis;
-  source: "text" | "photo" | "saved";
+  source: MealSource;
   savedMealId?: string;
 };
 
@@ -26,4 +29,6 @@ export type SavedMeal = {
   analysis: MealAnalysis;
   useCount: number;
   lastUsedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

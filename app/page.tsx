@@ -180,7 +180,7 @@ export default function Home() {
         {onboardingError&&<div className="onboarding-error" role="alert"><Icon name="info" size={15}/><span>{onboardingError}</span></div>}
         <div className="onboarding-actions">
           <button className="text-button onboarding-skip" onClick={()=>finishOnboarding(true)}>{t.skip}<Icon name="arrow" size={15}/></button>
-          <button className="primary-button wide" onClick={finishOnboarding}>{t.finish}<Icon name="arrow"/></button>
+          <button className="primary-button wide" onClick={()=>finishOnboarding()}>{t.finish}<Icon name="arrow"/></button>
         </div>
       </>}
     </div>

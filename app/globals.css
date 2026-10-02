@@ -160,3 +160,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
   .choice-rich small{font-size:9px}
   .onboarding-note{font-size:9px}
 }
+
+.onboarding-actions{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.onboarding-skip{justify-content:flex-start;padding:0 4px;color:var(--muted);white-space:nowrap}
+.onboarding-skip:hover{color:var(--brand)}
+.onboarding-actions .wide{min-width:0}
+@media(max-width:700px){
+  .onboarding-actions{grid-template-columns:1fr;gap:8px}
+  .onboarding-skip{justify-content:center;order:2;min-height:38px}
+}

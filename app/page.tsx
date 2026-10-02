@@ -92,7 +92,7 @@ export default function Home() {
   const [locale,setLocale]=useState<Locale>("pt"), [theme,setTheme]=useState<Theme>("light");
   const [onboarded,setOnboarded]=useState(false), [landingSeen,setLandingSeen]=useState(false), [step,setStep]=useState(1), [goal,setGoal]=useState<Goal>("maintain");
   const [authenticated,setAuthenticated]=useState(false), [authMode,setAuthMode]=useState<"login"|"signup">("signup"), [authEmail,setAuthEmail]=useState(""), [authPassword,setAuthPassword]=useState(""), [authLoading,setAuthLoading]=useState(false), [authError,setAuthError]=useState("");
-  const [accountPrompt,setAccountPrompt]=useState(false);
+  const [accountPrompt,setAccountPrompt]=useState(false), [authActive,setAuthActive]=useState(false);
   const [view,setView]=useState<View>("home"), [showLogger,setShowLogger]=useState(false);
   const [mealText,setMealText]=useState(""), [analyzing,setAnalyzing]=useState(false), [result,setResult]=useState(false);
   const [loggerMode,setLoggerMode]=useState<"describe"|"photo"|"usual">("describe"), [mealType,setMealType]=useState<Meal["type"]>("Dinner");
@@ -125,7 +125,7 @@ export default function Home() {
       const current=await supabaseAuth.getCurrentUser();
       if(!current){setAuthError(t.authCheckEmail);return}
       setAuthenticated(true); setAuthPassword("");
-      setAccountPrompt(false); setOnboarded(true); setLandingSeen(true);
+      setAccountPrompt(false); setAuthActive(false); setOnboarded(true); setLandingSeen(true);
       if(user) setView("home");
     }catch(error){setAuthError(error instanceof Error?error.message:t.authGeneric)}finally{setAuthLoading(false)}
   }
@@ -171,14 +171,14 @@ export default function Home() {
   function startUsual(m:Meal){setMealText(m.name);setMealType(m.type);setPortion("normal");setLoggerMode("usual");setResult(true);setShowLogger(true)}
 
   if(!landingSeen) return <main className="landing-shell"><header className="landing-nav"><div className="landing-brand"><span>M</span><b>Memo</b></div><button className="language-button" onClick={()=>setLocale(locale==="en"?"pt":"en")}><Icon name="globe" size={16}/>{locale.toUpperCase()}</button></header>
-  <section className="landing-hero"><div className="landing-copy"><span className="landing-eyebrow"><i/> {t.landingEyebrow}</span><h1>{t.landingTitle}</h1><p>{t.landingText}</p><div className="landing-actions"><button className="primary-button" onClick={()=>{setAuthError("");setLandingSeen(true);setAccountPrompt(false);setStep(1)}}>{t.landingCta}<Icon name="arrow" size={18}/></button><a href="#how">{t.landingSecondary}<Icon name="chevron" size={16}/></a></div><div className="landing-proof"><span>✓</span><p>{t.landingProof}</p></div></div>
+  <section className="landing-hero"><div className="landing-copy"><span className="landing-eyebrow"><i/> {t.landingEyebrow}</span><h1>{t.landingTitle}</h1><p>{t.landingText}</p><div className="landing-actions"><button className="primary-button" onClick={()=>{setAuthError("");setLandingSeen(true);setAccountPrompt(false);setAuthActive(false);setStep(1)}}>{t.landingCta}<Icon name="arrow" size={18}/></button><a href="#how">{t.landingSecondary}<Icon name="chevron" size={16}/></a></div><div className="landing-proof"><span>✓</span><p>{t.landingProof}</p></div></div>
     <div className="landing-product" aria-hidden="true"><div className="product-glow"/><div className="product-window"><div className="product-top"><div className="product-brand"><span>M</span><b>Memo</b></div><span className="product-date">{t.today}</span></div><div className="product-greeting"><span>{t.today}</span><strong>{t.hello}, {profile.name || "Alex"}.</strong><small>{t.subtitle}</small></div><div className="product-grid"><div className="product-card product-calories"><span>{t.calories}</span><strong>1,110 <small>/ 2,200</small></strong><div className="product-ring"><b>50%</b></div><div className="product-macros"><i/><i/><i/></div></div><div className="product-card product-memory"><span>✦ {t.memory}</span><strong>{t.landingMemoryTitle}</strong><small>{t.memoryText}</small></div></div><div className="product-section"><span>{t.usual}</span><strong>{t.oneTapMeals}</strong><div className="product-meals"><div><b>◒</b><span>{locale==="pt"?"Frango, arroz e feijão":"Chicken rice bowl"}<small>620 kcal</small></span><i>+</i></div><div><b>◉</b><span>{locale==="pt"?"Iogurte e banana":"Greek yogurt & banana"}<small>280 kcal</small></span><i>+</i></div></div></div></div></div></section>
   <section className="landing-trust"><span>{t.landingFeature1}</span><span>{t.landingFeature2}</span><span>{t.landingFeature3}</span></section>
   <section className="landing-how" id="how"><div className="landing-section-head"><span className="landing-eyebrow"><i/> MEMO</span><h2>{t.landingHow}</h2><p>{t.landingHowText}</p></div><div className="landing-steps"><article><span>01</span><div className="step-icon"><Icon name="clock" size={21}/></div><h3>{t.landingStep1}</h3><p>{t.landingStep1Text}</p></article><article><span>02</span><div className="step-icon"><Icon name="check" size={21}/></div><h3>{t.landingStep2}</h3><p>{t.landingStep2Text}</p></article><article><span>03</span><div className="step-icon"><Icon name="spark" size={21}/></div><h3>{t.landingStep3}</h3><p>{t.landingStep3Text}</p></article></div></section>
-  <section className="landing-memory"><div><span className="landing-eyebrow"><i/> {t.memory}</span><h2>{t.landingMemoryTitle}</h2><p>{t.landingMemoryText}</p><button className="primary-button" onClick={()=>{setLandingSeen(true);setAccountPrompt(false);setStep(1)}}>{t.landingCtaBottom}<Icon name="arrow" size={18}/></button></div><div className="memory-demo"><div className="memory-demo-top"><span>MEMO</span><span>+ {locale==="pt"?"aprendido":"learned"}</span></div><div className="memory-line"><b>{locale==="pt"?"Frango, arroz e feijão":"Chicken, rice & beans"}</b><span>{locale==="pt"?"Sua refeição habitual":"Your usual meal"}</span></div><div className="memory-line faded"><b>{locale==="pt"?"Iogurte e banana":"Greek yogurt & banana"}</b><span>{locale==="pt"?"Registrada 4 vezes":"Logged 4 times"}</span></div><div className="memory-button">⚡ {locale==="pt"?"Registrar em um toque":"Log in one tap"}</div></div></section><footer className="landing-footer"><span>{t.landingFooter}</span><small>{t.landingPrivacy}</small></footer></main>;
+  <section className="landing-memory"><div><span className="landing-eyebrow"><i/> {t.memory}</span><h2>{t.landingMemoryTitle}</h2><p>{t.landingMemoryText}</p><button className="primary-button" onClick={()=>{setLandingSeen(true);setAccountPrompt(false);setAuthActive(false);setStep(1)}}>{t.landingCtaBottom}<Icon name="arrow" size={18}/></button></div><div className="memory-demo"><div className="memory-demo-top"><span>MEMO</span><span>+ {locale==="pt"?"aprendido":"learned"}</span></div><div className="memory-line"><b>{locale==="pt"?"Frango, arroz e feijão":"Chicken, rice & beans"}</b><span>{locale==="pt"?"Sua refeição habitual":"Your usual meal"}</span></div><div className="memory-line faded"><b>{locale==="pt"?"Iogurte e banana":"Greek yogurt & banana"}</b><span>{locale==="pt"?"Registrada 4 vezes":"Logged 4 times"}</span></div><div className="memory-button">⚡ {locale==="pt"?"Registrar em um toque":"Log in one tap"}</div></div></section><footer className="landing-footer"><span>{t.landingFooter}</span><small>{t.landingPrivacy}</small></footer></main>;
 
-  if(landingSeen && !authenticated && accountPrompt===false && onboarded) return <main className="auth-shell"><div className="auth-card">
-    <button className="auth-back" onClick={()=>{setAuthError("");setAccountPrompt(true)}}><Icon name="back" size={17}/>{t.authBack}</button>
+  if(landingSeen && !authenticated && authActive) return <main className="auth-shell"><div className="auth-card">
+    <button className="auth-back" onClick={()=>{setAuthError("");setAuthActive(false);setAccountPrompt(true)}}><Icon name="back" size={17}/>{t.authBack}</button>
     <div className="auth-brand"><span>M</span><b>Memo</b></div>
     <div className="eyebrow"><span className="eyebrow-dot"/> MEMO</div>
     <h1>{authMode==="login"?t.authTitle:t.authSignupTitle}</h1><p>{authMode==="login"?t.authLoginText:t.authSignupText}</p>
@@ -203,9 +203,9 @@ export default function Home() {
         <div><Icon name="check" size={16}/><span>{t.accountBenefit2}</span></div>
         <div><Icon name="check" size={16}/><span>{t.accountBenefit3}</span></div>
       </div>
-      <button className="primary-button wide" onClick={()=>{setAuthMode("signup");setAuthError("");setAccountPrompt(false)}}>{t.createFreeAccount}<Icon name="arrow" size={17}/></button>
+      <button className="primary-button wide" onClick={()=>{setAuthMode("signup");setAuthError("");setAccountPrompt(false);setAuthActive(true)}}>{t.createFreeAccount}<Icon name="arrow" size={17}/></button>
       <button className="account-secondary" onClick={()=>{setOnboarded(true);setAccountPrompt(false);setView("home")}}>{t.continueWithoutAccount}</button>
-      <div className="account-login">{t.alreadyAccount} <button onClick={()=>{setAuthMode("login");setAuthError("");setAccountPrompt(false)}}>{t.login}</button></div>
+      <div className="account-login">{t.alreadyAccount} <button onClick={()=>{setAuthMode("login");setAuthError("");setAccountPrompt(false);setAuthActive(true)}}>{t.login}</button></div>
       <div className="auth-security"><Icon name="check" size={15}/><span>{t.accountSecurity}</span></div>
     </div>
   </main>;

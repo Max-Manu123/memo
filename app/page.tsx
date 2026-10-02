@@ -256,7 +256,7 @@ export default function Home() {
 
   return <div className="app-shell">
     <aside className="sidebar"><div className="sidebar-logo"><span>M</span><strong>Memo</strong></div><nav>{nav.map(([k,l,i])=><button key={k} className={"nav-item "+(view===k?"active":"")} onClick={()=>setView(k)}><Icon name={i} size={19}/><span>{l}</span></button>)}</nav>
-      <div className="sidebar-memory"><Icon name="spark" size={17}/><b>{t.memory}</b><p>{t.memoryText}</p></div><div className="profile-mini"><div className="avatar">{(profile.name.trim()[0]||"M").toUpperCase(){'}'}</div><div><b>{profile.name || "Memo"}</b><span>{t.freePlan}</span></div></div>
+      <div className="sidebar-memory"><Icon name="spark" size={17}/><b>{t.memory}</b><p>{t.memoryText}</p></div><div className="profile-mini"><div className="avatar">{(profile.name.trim()[0]||"M").toUpperCase()}</div><div><b>{profile.name || "Memo"}</b><span>{t.freePlan}</span></div></div>
     </aside>
     <main className="main-content">
       <header className="topbar"><div className="mobile-brand"><span>M</span><b>Memo</b></div><div className="topbar-actions">

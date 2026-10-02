@@ -206,3 +206,33 @@ html[data-theme="dark"] .auth-error{background:#351e1e;color:#ef9b9b}
 .account-login button{border:0;background:transparent;color:var(--brand);font-weight:800;padding:0 0 0 4px}
 .account-card .auth-security{justify-content:center;text-align:left}
 @media(max-width:600px){.account-shell{padding:18px}.account-card{padding:28px 21px;border-radius:20px}.account-card h1{font-size:29px}}
+
+/* Navigation pages polish */
+.history-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.history-summary .card{padding:18px 19px;display:flex;flex-direction:column;gap:4px}
+.history-summary strong{font-size:25px;letter-spacing:-.04em;margin-top:3px}
+.history-summary .card>span:last-child{font-size:10px;color:var(--muted)}
+.progress-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.progress-header h2{font-size:31px;letter-spacing:-.05em;margin:7px 0 0}
+.progress-header h2 small{font-size:11px;color:var(--muted);font-weight:650;letter-spacing:0}
+.progress-percent{font-size:18px;font-weight:850;color:var(--brand)}
+.progress-track{height:12px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin:28px 0 20px;border:1px solid var(--line)}
+.progress-track i{display:block;height:100%;background:var(--brand);border-radius:inherit;min-width:4px;transition:width .35s ease}
+.progress-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.progress-metrics div{padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2)}
+.progress-metrics span,.progress-metrics b{display:block}
+.progress-metrics span{font-size:9px;color:var(--muted)}
+.progress-metrics b{font-size:14px;margin-top:4px}
+.settings-profile{display:flex;align-items:center;gap:15px;margin-bottom:28px;padding:19px}
+.settings-profile .avatar.large{width:50px;height:50px;border-radius:15px;font-size:17px}
+.settings-profile h3{margin:4px 0 3px;font-size:18px}
+.settings-profile p{margin:0;color:var(--muted);font-size:11px}
+@media(max-width:700px){
+  .history-summary{gap:7px}
+  .history-summary .card{padding:14px 12px}
+  .history-summary strong{font-size:20px}
+  .progress-header h2{font-size:25px}
+  .progress-metrics{gap:6px}
+  .progress-metrics div{padding:9px}
+  .settings-profile{margin-bottom:22px}
+}

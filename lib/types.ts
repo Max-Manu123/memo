@@ -18,3 +18,12 @@ export type MealRecord = {
   source: "text" | "photo" | "saved";
   savedMealId?: string;
 };
+
+export type SavedMeal = {
+  id: string;
+  userId: string;
+  name: string;
+  analysis: MealAnalysis;
+  useCount: number;
+  lastUsedAt?: string;
+};

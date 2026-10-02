@@ -108,8 +108,25 @@ export default function Home() {
   const formatNumber=(n:number)=>n.toLocaleString(locale==="pt"?"pt-PT":"en-US");
   const learned=useMemo(()=>meals.slice(0,3),[meals]);
 
-  function validateOnboarding(){const name=profile.name.trim();if(name.length<2){setOnboardingError(t.invalidName);return false}setOnboardingError("");return true}
-  function finishOnboarding(){if(validateOnboarding()){setOnboarded(true);setView("home")}}
+  function validateOnboarding(validateOptional=true){
+    const name=profile.name.trim();
+    if(name.length<2){setOnboardingError(t.invalidName);return false}
+    if(validateOptional && profile.age){
+      const age=Number(profile.age);
+      if(!Number.isFinite(age)||age<13||age>100){setOnboardingError(t.invalidAge);return false}
+    }
+    if(validateOptional && profile.weight){
+      const weight=Number(profile.weight);
+      if(!Number.isFinite(weight)||weight<30||weight>300){setOnboardingError(t.invalidWeight);return false}
+    }
+    if(validateOptional && profile.height){
+      const height=Number(profile.height);
+      if(!Number.isFinite(height)||height<100||height>230){setOnboardingError(t.invalidHeight);return false}
+    }
+    setOnboardingError("");
+    return true
+  }
+  function finishOnboarding(skipOptional=false){if(validateOnboarding(!skipOptional)){setOnboarded(true);setView("home")}}
 
   function openLogger(mode:"describe"|"photo"|"usual"="describe"){setLoggerMode(mode);setResult(false);setPhotoName("");setMealText("");setMealType("Dinner");setPortion("normal");setAnalyzing(false);setShowLogger(true)}
   function analyze(){if(loggerMode==="photo"&&!photoName)return;if(loggerMode==="describe"&&!mealText.trim())return;setAnalyzing(true);setTimeout(()=>{setAnalyzing(false);setResult(true)},650)}
@@ -162,7 +179,7 @@ export default function Home() {
         <div className="onboarding-note"><Icon name="spark" size={16}/><span>{t.detailsHint}</span></div>
         {onboardingError&&<div className="onboarding-error" role="alert"><Icon name="info" size={15}/><span>{onboardingError}</span></div>}
         <div className="onboarding-actions">
-          <button className="text-button onboarding-skip" onClick={finishOnboarding}>{t.skip}<Icon name="arrow" size={15}/></button>
+          <button className="text-button onboarding-skip" onClick={()=>finishOnboarding(true)}>{t.skip}<Icon name="arrow" size={15}/></button>
           <button className="primary-button wide" onClick={finishOnboarding}>{t.finish}<Icon name="arrow"/></button>
         </div>
       </>}

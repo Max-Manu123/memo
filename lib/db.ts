@@ -1,4 +1,4 @@
-import type { Goal, MealRecord } from "./types";
+import type { Goal, MealRecord, SavedMeal } from "./types";
 
 export type Profile = {
   userId: string;
@@ -7,15 +7,8 @@ export type Profile = {
   weightKg?: number;
   heightCm?: number;
   goal: Goal;
-};
-
-export type SavedMeal = {
-  id: string;
-  userId: string;
-  name: string;
-  analysis: MealRecord["analysis"];
-  useCount: number;
-  lastUsedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type DbAdapter = {

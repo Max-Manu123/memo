@@ -262,3 +262,21 @@ html[data-theme="dark"] .auth-error{background:#351e1e;color:#ef9b9b}
   .onboarding-profile-header{margin-bottom:17px}
   .onboarding-profile-eyebrow{font-size:8px}
 }
+
+
+/* Professional authentication controls */
+.auth-password-field{position:relative;display:flex;align-items:center}
+.auth-password-field input{padding-right:44px!important}
+.auth-eye{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--muted);display:grid;place-items:center;padding:0;cursor:pointer}
+.auth-eye:hover{background:var(--brand-soft);color:var(--brand)}
+.auth-eye:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.auth-back{color:var(--muted);padding:7px 9px;border-radius:9px;transition:background .15s,color .15s}
+.auth-back:hover{background:var(--surface-2);color:var(--text)}
+.auth-forgot{border:0;background:transparent;color:#3979b8;font-size:11px;font-weight:800;padding:0;margin:15px auto 0;display:block;cursor:pointer}
+.auth-forgot:hover{color:#28649f;text-decoration:underline}
+.auth-switch button{color:#3979b8}
+.auth-switch button:hover{color:#28649f}
+html[data-theme="dark"] .auth-forgot,html[data-theme="dark"] .auth-switch button{color:#78aee0}
+html[data-theme="dark"] .auth-forgot:hover,html[data-theme="dark"] .auth-switch button:hover{color:#9bc8ef}
+.auth-card .auth-form input[aria-invalid="true"]{border-color:#c85b5b;box-shadow:0 0 0 3px color-mix(in srgb,#c85b5b 10%,transparent)}
+.auth-form input:disabled{opacity:.65;cursor:not-allowed}

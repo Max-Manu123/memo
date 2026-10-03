@@ -299,3 +299,24 @@ html[data-theme="dark"] .auth-forgot:hover,html[data-theme="dark"] .auth-switch 
 /* Settings selectors */
 .theme-options{display:flex;gap:7px;margin-top:10px}.theme-options button{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--muted);font-size:10px;font-weight:800;cursor:pointer;transition:.15s}.theme-options button:hover{border-color:var(--brand);color:var(--brand)}.theme-options button.active{background:var(--brand-soft);border-color:color-mix(in srgb,var(--brand) 35%,var(--line));color:var(--brand)}.language-options button{flex-direction:column;gap:2px}.language-options button span{font-size:9px;letter-spacing:.08em}.language-options button b{font-size:10px}.language-options{margin-bottom:2px}
 @media(max-width:700px){.theme-options{gap:5px}.theme-options button{min-height:39px;padding:7px 4px}}
+
+
+/* Home controls and consistent profile avatars */
+.home-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.home-control-group{display:flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--line);background:var(--surface);border-radius:10px}
+.home-control-group button{width:31px;height:31px;border:0;border-radius:7px;background:transparent;color:var(--muted);display:grid;place-items:center;font-size:9px;font-weight:850;cursor:pointer;transition:.15s}
+.home-control-group button:hover{color:var(--brand);background:var(--surface-2)}
+.home-control-group button.active{background:var(--brand-soft);color:var(--brand)}
+.avatar-button{border:1px solid var(--line);cursor:pointer;padding:0;background:var(--accent);transition:.15s}
+.avatar-button:hover{border-color:var(--brand);transform:translateY(-1px)}
+.profile-mini-button .avatar{border:1px solid transparent}
+.profile-mini-button:hover .avatar{border-color:var(--brand)}
+@media(max-width:900px){
+  .welcome-row{align-items:flex-start}
+  .home-actions{max-width:360px}
+}
+@media(max-width:700px){
+  .welcome-row{flex-direction:column;gap:15px;margin-bottom:25px}
+  .home-actions{width:100%;max-width:none;justify-content:flex-start}
+  .home-actions .desktop-add{margin-left:auto}
+}

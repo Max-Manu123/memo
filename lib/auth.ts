@@ -15,6 +15,7 @@ export type AuthAdapter = {
   signIn(input: SignInInput): Promise<AuthUser>;
   signOut(): Promise<void>;
   getCurrentUser(): Promise<AuthUser | null>;
+  resetPassword(email: string): Promise<void>;
 };
 
 export const auth: AuthAdapter = {

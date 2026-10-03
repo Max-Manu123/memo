@@ -38,4 +38,9 @@ export const supabaseAuth: AuthAdapter = {
     const { error } = await getSupabase().auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/` });
     if (error) throw error;
   },
+
+  async updatePassword(password: string): Promise<void> {
+    const { error } = await getSupabase().auth.updateUser({ password });
+    if (error) throw error;
+  },
 };

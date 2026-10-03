@@ -106,9 +106,11 @@ export default function Home() {
   const [onboarded,setOnboarded]=useState(false), [landingSeen,setLandingSeen]=useState(false), [step,setStep]=useState(1), [goal,setGoal]=useState<Goal|"">("");
   const [authenticated,setAuthenticated]=useState(false), [authMode,setAuthMode]=useState<"login"|"signup"|"resetRequest"|"resetPassword">("signup"), [authEmail,setAuthEmail]=useState(""), [authPassword,setAuthPassword]=useState(""), [authConfirmPassword,setAuthConfirmPassword]=useState(""), [showAuthPassword,setShowAuthPassword]=useState(false), [showAuthConfirmPassword,setShowAuthConfirmPassword]=useState(false), [authLoading,setAuthLoading]=useState(false), [authError,setAuthError]=useState(""), [authNotice,setAuthNotice]=useState("");
   const [accountPrompt,setAccountPrompt]=useState(false), [authActive,setAuthActive]=useState(false);
-  const [view,setView]=useState<View>("home"), [showLogger,setShowLogger]=useState(false);
+  const [view,setView]=useState<View>("home"), [showLogger,setShowLogger]=useState(false), [showUpgrade,setShowUpgrade]=useState(false);
+  const [authUserId,setAuthUserId]=useState(""), [selectedUsualId,setSelectedUsualId]=useState(""), [foodSearch,setFoodSearch]=useState(""), [estimate,setEstimate]=useState({min:450,max:610,protein:31,carbs:56,fat:18});
+  const [upgradeEmail,setUpgradeEmail]=useState(""), [upgradeLoading,setUpgradeLoading]=useState(false), [upgradeNotice,setUpgradeNotice]=useState("");
   const [mealText,setMealText]=useState(""), [analyzing,setAnalyzing]=useState(false), [result,setResult]=useState(false);
-  const [loggerMode,setLoggerMode]=useState<"describe"|"photo"|"usual">("describe"), [mealType,setMealType]=useState<Meal["type"]>("Dinner");
+  const [loggerMode,setLoggerMode]=useState<"describe"|"search"|"photo"|"usual">("describe"), [mealType,setMealType]=useState<Meal["type"]>("Dinner");
   const [portion,setPortion]=useState("normal"), [photoName,setPhotoName]=useState("");
   const [meals,setMeals]=useState<Meal[]>(demoMeals);
   const [profile,setProfile]=useState({name:"",age:"",weight:"",height:""});
@@ -117,7 +119,7 @@ export default function Home() {
   const [trackingPain,setTrackingPain]=useState<TrackingPain|"">("");
   const t=copy[locale];
 
-  useEffect(()=>{const recovery=typeof window!=="undefined"&&window.location.hash.includes("type=recovery"); if(recovery){setAuthActive(true);setAuthMode("resetPassword");setLandingSeen(true)} supabaseAuth.getCurrentUser().then(user=>{if(user&&!recovery)setAuthenticated(true)}).catch(()=>{}); const raw=localStorage.getItem("memo-demo");if(raw){try{const d=JSON.parse(raw);setOnboarded(!!d.onboarded);setLandingSeen(!!d.landingSeen);setGoal(d.goal==="lose"||d.goal==="maintain"||d.goal==="gain"?d.goal:"");setLocale(d.locale??"pt");setTheme(d.theme??"light");setProfile(d.profile??{name:"",age:"",weight:"",height:""});setTrackingMethod(Array.isArray(d.trackingMethod)?d.trackingMethod:[]);setTrackingPain(d.trackingPain==="repeat"||d.trackingPain==="search"||d.trackingPain==="manual"||d.trackingPain==="remember"||d.trackingPain==="corrections"||d.trackingPain==="speed"||d.trackingPain==="none"?d.trackingPain:"");setMeals(Array.isArray(d.meals)&&d.meals.length?d.meals:demoMeals)}catch{}}},[]);
+  useEffect(()=>{const recovery=typeof window!=="undefined"&&window.location.hash.includes("type=recovery"); if(recovery){setAuthActive(true);setAuthMode("resetPassword");setLandingSeen(true)} supabaseAuth.getCurrentUser().then(user=>{if(user){setAuthUserId(user.id);setAuthEmail(user.email);if(!recovery)setAuthenticated(true)}}).catch(()=>{}); const raw=localStorage.getItem("memo-demo");if(raw){try{const d=JSON.parse(raw);setOnboarded(!!d.onboarded);setLandingSeen(!!d.landingSeen);setGoal(d.goal==="lose"||d.goal==="maintain"||d.goal==="gain"?d.goal:"");setLocale(d.locale??"pt");setTheme(d.theme??"light");setProfile(d.profile??{name:"",age:"",weight:"",height:""});setTrackingMethod(Array.isArray(d.trackingMethod)?d.trackingMethod:[]);setTrackingPain(d.trackingPain==="repeat"||d.trackingPain==="search"||d.trackingPain==="manual"||d.trackingPain==="remember"||d.trackingPain==="corrections"||d.trackingPain==="speed"||d.trackingPain==="none"?d.trackingPain:"");setMeals(Array.isArray(d.meals)?d.meals:[])}catch{}}},[]);
   useEffect(()=>{document.documentElement.dataset.theme=theme;localStorage.setItem("memo-demo",JSON.stringify({onboarded,landingSeen,goal,locale,theme,profile,trackingMethod,trackingPain,meals}))},[onboarded,landingSeen,goal,locale,theme,profile,trackingMethod,trackingPain,meals]);
 
   const calories=meals.reduce((s,m)=>s+m.calories,0), protein=meals.reduce((s,m)=>s+m.protein,0);
@@ -125,7 +127,17 @@ export default function Home() {
   const target=goal==="lose"?1900:goal==="gain"?2500:2200;
   const remainingCalories=Math.max(0,target-calories);
   const formatNumber=(n:number)=>n.toLocaleString(locale==="pt"?"pt-PT":"en-US");
-  const learned=useMemo(()=>meals.slice(0,3),[meals]);
+  const now=new Date();
+  const todayKey=now.toDateString();
+  const mealDate=(m:Meal)=>m.loggedAt?new Date(m.loggedAt):now;
+  const todayMeals=useMemo(()=>meals.filter(m=>mealDate(m).toDateString()===todayKey),[meals,todayKey]);
+  const last7Meals=useMemo(()=>meals.filter(m=>now.getTime()-mealDate(m).getTime()<7*86400000),[meals]);
+  const todayCalories=todayMeals.reduce((s,m)=>s+m.calories,0), todayProtein=todayMeals.reduce((s,m)=>s+m.protein,0), todayCarbs=todayMeals.reduce((s,m)=>s+m.carbs,0), todayFat=todayMeals.reduce((s,m)=>s+m.fat,0);
+  const learned=useMemo(()=>Array.from(new Map(meals.filter(m=>m.saved).map(m=>[m.name.toLowerCase(),m])).values()).sort((a,b)=>(b.useCount??1)-(a.useCount??1)).slice(0,6),[meals]);
+  const filteredFoods=useMemo(()=>{const q=foodSearch.trim().toLowerCase();return foodDatabase.filter(f=>!q||[f.pt,f.en,...f.aliases].some(v=>v.toLowerCase().includes(q))).slice(0,8)},[foodSearch]);
+  const activeDays=useMemo(()=>new Set(last7Meals.map(m=>mealDate(m).toDateString())).size,[last7Meals]);
+  const averageCalories=last7Meals.length?Math.round(last7Meals.reduce((s,m)=>s+m.calories,0)/Math.max(1,activeDays)):0;
+  const repeated=useMemo(()=>{const counts=new Map<string,number>();meals.forEach(m=>counts.set(m.name.toLowerCase(),(counts.get(m.name.toLowerCase())??0)+1));return Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]).slice(0,3)},[meals]);
 
   function normalizeAuthEmail(value:string){
     return value.trim().toLowerCase();
@@ -194,7 +206,7 @@ export default function Home() {
       }
       const current=await supabaseAuth.getCurrentUser();
       if(!current){setAuthError(t.authCheckEmail);return}
-      setAuthenticated(true);setAuthPassword("");setAuthConfirmPassword("");
+      setAuthenticated(true);setAuthUserId(current.id);setAuthEmail(current.email);setAuthPassword("");setAuthConfirmPassword("");
       setAccountPrompt(false);setAuthActive(false);setAuthNotice("");setOnboarded(true);setLandingSeen(true);
       setView("home");
     }catch(error){setAuthError(friendlyAuthError(error))}

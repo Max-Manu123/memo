@@ -320,3 +320,24 @@ html[data-theme="dark"] .auth-forgot:hover,html[data-theme="dark"] .auth-switch 
   .home-actions{width:100%;max-width:none;justify-content:flex-start}
   .home-actions .desktop-add{margin-left:auto}
 }
+
+
+.settings-profile{position:relative;gap:14px}
+.settings-profile>div:nth-child(2){flex:1;min-width:0}
+.settings-edit-button{min-height:36px;padding:0 13px;font-size:10px;flex:0 0 auto}
+.settings-notice{display:flex;align-items:center;gap:8px;margin:-4px 0 12px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:var(--brand-soft);color:var(--brand);font-size:10px;font-weight:750}
+.settings-editor,.settings-goal-editor{padding:19px;margin-bottom:14px}
+.settings-editor-header{margin-bottom:17px}
+.settings-editor-header h3,.settings-goal-editor h3{margin:5px 0 4px;font-size:17px;letter-spacing:-.02em}
+.settings-editor-header p{margin:0;color:var(--muted);font-size:10px;line-height:1.5}
+.settings-editor .input-grid-rich{margin-bottom:14px}
+.settings-goal-editor>div:first-child{margin-bottom:12px}
+.goal-options-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.goal-options-settings button{min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--muted);font-size:10px;font-weight:800;cursor:pointer}
+.goal-options-settings button:hover{border-color:var(--brand);color:var(--brand)}
+.goal-options-settings button.active{background:var(--brand-soft);border-color:color-mix(in srgb,var(--brand) 35%,var(--line));color:var(--brand)}
+@media(max-width:700px){
+  .settings-profile{align-items:flex-start}
+  .settings-edit-button{min-height:34px;padding:0 10px}
+  .goal-options-settings{grid-template-columns:1fr}
+}

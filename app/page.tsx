@@ -121,11 +121,11 @@ export default function Home() {
   }
 
   function validateAuthEmail(email:string){
-    return email.length<=254 && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(email);
+    return email.length<=254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
   }
 
   function validateSignupPassword(password:string){
-    return password.length>=8 && password.length<=128 && /[A-Za-z]/.test(password) && /\\d/.test(password);
+    return password.length>=8 && password.length<=128 && /[A-Za-z]/.test(password) && /\d/.test(password);
   }
 
   function friendlyAuthError(error:unknown){

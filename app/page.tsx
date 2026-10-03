@@ -135,8 +135,8 @@ export default function Home() {
   }
 
   function validateProfile(){
-    const name=profile.name.trim().replace(/\\s+/g," ");
-    if(name.length<2||name.length>80||!/[\\p{L}]/u.test(name)){setOnboardingError(t.invalidName);return false}
+    const name=profile.name.trim().replace(/\s+/g," ");
+    if(name.length<2||name.length>80||!/[\p{L}]/u.test(name)){setOnboardingError(t.invalidName);return false}
     if(profile.age){
       const age=Number(profile.age);
       if(!Number.isInteger(age)||age<13||age>100){setOnboardingError(t.invalidAge);return false}
@@ -263,7 +263,8 @@ export default function Home() {
         <button className="back-button" onClick={()=>{setOnboardingError("");setStep(1)}}><Icon name="back" size={18}/>{t.back}</button>
         <div className="onboarding-kicker">02 / 05</div><h1>{t.goalTitle}</h1><p>{t.goalText}</p>
         <div className="choice-list">{([[["lose","↓",t.goalLoseText],["maintain","→",t.goalMaintainText],["gain","↑",t.goalGainText]]] as [Goal,string,string][][])[0].map(([g,icon,description])=><button key={g} className={"choice choice-rich "+(goal===g?"selected":"")} onClick={()=>{setGoal(g);setOnboardingError("")}}><span className="choice-icon">{icon}</span><div><b>{t[g]}</b><small>{description}</small></div>{goal===g&&<Icon name="check" size={18}/>}</button>)}</div>
-        <div className="selection-status"><Icon name="check" size={14}/><span>{goal==="lose"?t.lose:goal==="gain"?t.gain:t.maintain}</span></div>
+        {goal&&<div className="selection-status"><Icon name="check" size={14}/><span>{goal==="lose"?t.lose:goal==="gain"?t.gain:t.maintain}</span></div>}
+        {onboardingError&&<div className="onboarding-error" role="alert"><Icon name="info" size={15}/><span>{onboardingError}</span></div>}
         <button className="primary-button wide" onClick={()=>{if(validateStep(2))setStep(3)}}>{t.continue}<Icon name="arrow"/></button>
       </>}
 
@@ -271,6 +272,7 @@ export default function Home() {
         <button className="back-button" onClick={()=>{setOnboardingError("");setStep(2)}}><Icon name="back" size={18}/>{t.back}</button>
         <div className="onboarding-kicker">03 / 05</div><h1>{t.trackingTitle}</h1><p>{t.trackingText}</p>
         <div className="onboarding-choice-grid">{([[["search",t.trackingSearch],["text",t.trackingTextMethod],["photo",t.trackingPhoto],["weigh",t.trackingWeigh],["repeat",t.trackingRepeat],["none",t.trackingNone]]] as [TrackingMethod,string][][])[0].map(([method,label])=><button key={method} className={"onboarding-chip "+(trackingMethod.includes(method)?"selected":"")} onClick={()=>toggleTrackingMethod(method)}>{label}{trackingMethod.includes(method)&&<Icon name="check" size={15}/>}</button>)}</div>
+        {onboardingError&&<div className="onboarding-error" role="alert"><Icon name="info" size={15}/><span>{onboardingError}</span></div>}
         <button className="primary-button wide" onClick={()=>{if(validateStep(3))setStep(4)}}>{t.continue}<Icon name="arrow"/></button>
       </>}
 
@@ -308,7 +310,7 @@ export default function Home() {
           </label>
           <label>
             <span>{t.age}<em>{t.optional}</em></span>
-            <input value={profile.age} onChange={e=>{setProfile(p=>({...p,age:e.target.value.replace(/\\D/g,"").slice(0,3)}));setOnboardingError("")}} onBlur={()=>{if(profile.age)validateProfile()}} placeholder={t.ageHint} inputMode="numeric" maxLength={3}/>
+            <input value={profile.age} onChange={e=>{setProfile(p=>({...p,age:e.target.value.replace(/\D/g,"").slice(0,3)}));setOnboardingError("")}} onBlur={()=>{if(profile.age)validateProfile()}} placeholder={t.ageHint} inputMode="numeric" maxLength={3}/>
             <small>{t.ageRange}</small>
           </label>
           <label>
@@ -318,7 +320,7 @@ export default function Home() {
           </label>
           <label>
             <span>{t.height}<em>{t.optional}</em></span>
-            <input value={profile.height} onChange={e=>{setProfile(p=>({...p,height:e.target.value.replace(/\\D/g,"").slice(0,3)}));setOnboardingError("")}} onBlur={()=>{if(profile.height)validateProfile()}} placeholder={t.heightHint} inputMode="numeric" maxLength={3}/>
+            <input value={profile.height} onChange={e=>{setProfile(p=>({...p,height:e.target.value.replace(/\D/g,"").slice(0,3)}));setOnboardingError("")}} onBlur={()=>{if(profile.height)validateProfile()}} placeholder={t.heightHint} inputMode="numeric" maxLength={3}/>
             <small>{t.heightRange}</small>
           </label>
         </div>

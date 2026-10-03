@@ -287,7 +287,7 @@ export default function Home() {
         <div className="auth-password-field">
           <input type="password" value={authPassword} onChange={e=>{setAuthPassword(e.target.value.slice(0,128));setAuthError("");setAuthNotice("")}} placeholder="••••••••" autoComplete={authMode==="login"?"current-password":"new-password"} minLength={8} maxLength={128} aria-invalid={!!authError} required/>
         </div>
-        {authMode==="signup"||authMode==="resetPassword"?<small>{t.authPasswordHint}</small>:null}
+        {authMode==="signup"?<small>{t.authPasswordHint}</small>:null}
       </label>}
       {(authMode==="signup"||authMode==="resetPassword")&&<label>
         <span>{t.authConfirmPassword}</span>

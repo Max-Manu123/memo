@@ -93,7 +93,7 @@ function ProgressRing({ value,max }:{value:number;max:number}) {
 export default function Home() {
   const [locale,setLocale]=useState<Locale>("pt"), [theme,setTheme]=useState<Theme>("light");
   const [onboarded,setOnboarded]=useState(false), [landingSeen,setLandingSeen]=useState(false), [step,setStep]=useState(1), [goal,setGoal]=useState<Goal|"">("");
-  const [authenticated,setAuthenticated]=useState(false), [authMode,setAuthMode]=useState<"login"|"signup"|"resetRequest"|"resetPassword">("signup"), [authEmail,setAuthEmail]=useState(""), [authPassword,setAuthPassword]=useState(""), [authConfirmPassword,setAuthConfirmPassword]=useState(""), [authLoading,setAuthLoading]=useState(false), [authError,setAuthError]=useState(""), [authNotice,setAuthNotice]=useState("");
+  const [authenticated,setAuthenticated]=useState(false), [authMode,setAuthMode]=useState<"login"|"signup"|"resetRequest"|"resetPassword">("signup"), [authEmail,setAuthEmail]=useState(""), [authPassword,setAuthPassword]=useState(""), [authConfirmPassword,setAuthConfirmPassword]=useState(""), [showAuthPassword,setShowAuthPassword]=useState(false), [showAuthConfirmPassword,setShowAuthConfirmPassword]=useState(false), [authLoading,setAuthLoading]=useState(false), [authError,setAuthError]=useState(""), [authNotice,setAuthNotice]=useState("");
   const [accountPrompt,setAccountPrompt]=useState(false), [authActive,setAuthActive]=useState(false);
   const [view,setView]=useState<View>("home"), [showLogger,setShowLogger]=useState(false);
   const [mealText,setMealText]=useState(""), [analyzing,setAnalyzing]=useState(false), [result,setResult]=useState(false);

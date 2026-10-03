@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabaseAuth } from "../lib/auth.supabase";
-import { isSupabaseConfigured } from "../lib/supabase";
+import { getSupabase, isSupabaseConfigured } from "../lib/supabase";
 
 type Goal = "lose" | "maintain" | "gain";
 type View = "home" | "history" | "progress" | "settings";
@@ -14,12 +14,23 @@ type Meal = {
   id: string; name: string; time: string; calories: number; protein: number;
   carbs: number; fat: number; note: string; confidence: "High" | "Medium";
   type: "Breakfast" | "Lunch" | "Snack" | "Dinner";
+  loggedAt?: string; saved?: boolean; useCount?: number; savedMealId?: string;
 };
 
-const demoMeals: Meal[] = [
-  { id:"1", name:"Chicken rice bowl", time:"12:42", calories:620, protein:42, carbs:68, fat:18, note:"Your usual lunch", confidence:"High", type:"Lunch" },
-  { id:"2", name:"Greek yogurt & banana", time:"08:15", calories:280, protein:17, carbs:39, fat:7, note:"Logged from a saved meal", confidence:"High", type:"Breakfast" },
-  { id:"3", name:"Apple & peanut butter", time:"16:20", calories:210, protein:6, carbs:25, fat:10, note:"Estimated from description", confidence:"Medium", type:"Snack" },
+const demoMeals: Meal[] = [];
+
+type FoodItem = { id:string; pt:string; en:string; aliases:string[]; calories:number; protein:number; carbs:number; fat:number };
+const foodDatabase: FoodItem[] = [
+  {id:"rice",pt:"Arroz cozido",en:"Cooked rice",aliases:["arroz","rice"],calories:130,protein:2.7,carbs:28,fat:.3},
+  {id:"chicken",pt:"Frango grelhado",en:"Grilled chicken",aliases:["frango","chicken"],calories:165,protein:31,carbs:0,fat:3.6},
+  {id:"beans",pt:"Feijão cozido",en:"Cooked beans",aliases:["feijão","feijao","beans"],calories:127,protein:8.7,carbs:22.8,fat:.5},
+  {id:"egg",pt:"Ovo",en:"Egg",aliases:["ovo","ovos","egg","eggs"],calories:143,protein:12.6,carbs:.7,fat:9.5},
+  {id:"banana",pt:"Banana",en:"Banana",aliases:["banana"],calories:89,protein:1.1,carbs:22.8,fat:.3},
+  {id:"oats",pt:"Aveia",en:"Oatmeal",aliases:["aveia","oatmeal","oats"],calories:389,protein:16.9,carbs:66.3,fat:6.9},
+  {id:"yogurt",pt:"Iogurte grego",en:"Greek yogurt",aliases:["iogurte","iogurte grego","yogurt","greek yogurt"],calories:73,protein:9.9,carbs:3.9,fat:2},
+  {id:"bread",pt:"Pão",en:"Bread",aliases:["pão","pao","bread"],calories:266,protein:8.9,carbs:49,fat:3.2},
+  {id:"apple",pt:"Maçã",en:"Apple",aliases:["maçã","maca","apple"],calories:52,protein:.3,carbs:13.8,fat:.2},
+  {id:"peanut",pt:"Pasta de amendoim",en:"Peanut butter",aliases:["pasta de amendoim","peanut butter"],calories:588,protein:25,carbs:20,fat:50},
 ];
 
 const copy = {

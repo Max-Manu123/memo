@@ -282,16 +282,20 @@ export default function Home() {
         <input type="email" value={authEmail} onChange={e=>{setAuthEmail(e.target.value.slice(0,254));setAuthError("");setAuthNotice("")}} placeholder="you@example.com" autoComplete="email" inputMode="email" maxLength={254} aria-invalid={!!authError} required/>
         <small>{t.authEmailHint}</small>
       </label>
-      {authMode!=="resetRequest"&&authMode!=="resetPassword"&&<label>
+      {authMode!=="resetRequest"&&<label>
         <span>{t.password}</span>
         <div className="auth-password-field">
-          <input type="password" value={authPassword} onChange={e=>{setAuthPassword(e.target.value.slice(0,128));setAuthError("");setAuthNotice("")}} placeholder="••••••••" autoComplete={authMode==="login"?"current-password":"new-password"} type={showAuthPassword?"text":"password"} minLength={8} maxLength={128} aria-invalid={!!authError} required/>
+          <input type={showAuthPassword?"text":"password"} value={authPassword} onChange={e=>{setAuthPassword(e.target.value.slice(0,128));setAuthError("");setAuthNotice("")}} placeholder="••••••••" autoComplete={authMode==="login"?"current-password":"new-password"} minLength={8} maxLength={128} aria-invalid={!!authError} required/>
+          <button type="button" className="auth-eye" onClick={()=>setShowAuthPassword(v=>!v)} aria-label={showAuthPassword?"Hide password":"Show password"}>{showAuthPassword?<Icon name="eye-off" size={17}/>:<Icon name="eye" size={17}/>}</button>
         </div>
-        {authMode==="signup"?<small>{t.authPasswordHint}</small>:null}
+        {authMode==="signup"||authMode==="resetPassword"?<small>{t.authPasswordHint}</small>:null}
       </label>}
       {(authMode==="signup"||authMode==="resetPassword")&&<label>
         <span>{t.authConfirmPassword}</span>
-        <div className="auth-password-field"><input type={showAuthConfirmPassword?"text":"password"} value={authConfirmPassword} onChange={e=>{setAuthConfirmPassword(e.target.value.slice(0,128));setAuthError("");setAuthNotice("")}} placeholder="••••••••" autoComplete="new-password" maxLength={128} aria-invalid={!!authError} required/>
+        <div className="auth-password-field">
+          <input type={showAuthConfirmPassword?"text":"password"} value={authConfirmPassword} onChange={e=>{setAuthConfirmPassword(e.target.value.slice(0,128));setAuthError("");setAuthNotice("")}} placeholder="••••••••" autoComplete="new-password" minLength={8} maxLength={128} aria-invalid={!!authError} required/>
+          <button type="button" className="auth-eye" onClick={()=>setShowAuthConfirmPassword(v=>!v)} aria-label={showAuthConfirmPassword?"Hide password":"Show password"}>{showAuthConfirmPassword?<Icon name="eye-off" size={17}/>:<Icon name="eye" size={17}/>}</button>
+        </div>
         <small>{t.authConfirmHint}</small>
       </label>}
       {authError&&<div className="auth-error" role="alert"><Icon name="info" size={15}/><span>{authError}</span></div>}

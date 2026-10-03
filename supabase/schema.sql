@@ -217,3 +217,36 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
+
+
+-- ============================================================
+-- Pro waitlist
+-- Signed-out visitors may submit an email, but nobody can read
+-- the table through the public Data API.
+-- ============================================================
+create table if not exists public.pro_waitlist (
+  id uuid primary key default gen_random_uuid(),
+  email text not null check (
+    length(email) between 5 and 254
+    and email = lower(email)
+    and email ~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]{2,}$'
+  ),
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists pro_waitlist_email_idx
+  on public.pro_waitlist (lower(email));
+
+alter table public.pro_waitlist enable row level security;
+
+revoke all on table public.pro_waitlist from anon, authenticated;
+grant insert on table public.pro_waitlist to anon, authenticated;
+
+drop policy if exists "Anyone can join the Pro waitlist" on public.pro_waitlist;
+create policy "Anyone can join the Pro waitlist"
+  on public.pro_waitlist for insert
+  to anon, authenticated
+  with check (email = lower(email));
+
+revoke all on table public.profiles, public.meals, public.saved_meals from anon, authenticated;
+grant select, insert, update, delete on table public.profiles, public.meals, public.saved_meals to authenticated;

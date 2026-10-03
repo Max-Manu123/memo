@@ -241,3 +241,25 @@ html[data-theme="dark"] .auth-error{background:#351e1e;color:#ef9b9b}
   .progress-metrics div{padding:9px}
   .settings-profile{margin-bottom:22px}
 }
+
+
+/* Onboarding navigation and final-step polish */
+.onboarding-brand{position:relative}
+.onboarding-global-skip{margin-left:auto;border:0;background:transparent;color:var(--muted);display:inline-flex;align-items:center;gap:5px;padding:6px 0 6px 8px;font-size:10px;font-weight:800;white-space:nowrap}
+.onboarding-global-skip:hover{color:var(--brand)}
+.onboarding-back-landing{border:0;background:transparent;color:var(--muted);display:inline-flex;align-items:center;gap:6px;padding:0;margin:0 0 18px;font-size:10px;font-weight:750}
+.onboarding-back-landing:hover{color:var(--brand)}
+.onboarding-section-divider{display:flex;align-items:center;gap:9px;margin:25px 0 10px;padding-top:20px;border-top:1px solid var(--line)}
+.onboarding-section-divider span{font-size:10px;color:var(--text);font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.onboarding-section-divider small{margin-left:auto;color:var(--muted);font-size:9px;font-weight:700}
+.onboarding-profile-copy{margin-bottom:16px}
+.onboarding-profile-copy b{display:block;font-size:14px;letter-spacing:-.02em}
+.onboarding-profile-copy p{margin:4px 0 0!important;color:var(--muted);font-size:11px!important;line-height:1.5!important}
+.input-grid-rich label>span{display:flex;align-items:center;gap:6px}
+.input-grid-rich label>span em{font-style:normal;font-size:8px;font-weight:700;color:var(--muted);margin-left:auto}
+.input-grid-rich label:first-child>span em{color:var(--brand)}
+@media(max-width:700px){
+  .onboarding-global-skip{font-size:9px}
+  .onboarding-back-landing{margin-bottom:15px}
+  .onboarding-section-divider{margin-top:21px;padding-top:17px}
+}

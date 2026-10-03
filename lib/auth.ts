@@ -1,6 +1,7 @@
 export type AuthUser = {
   id: string;
   email: string;
+  emailConfirmed?: boolean;
 };
 
 export type SignUpInput = {
@@ -31,5 +32,11 @@ export const auth: AuthAdapter = {
   },
   async getCurrentUser() {
     return null;
+  },
+  async resetPassword() {
+    throw new Error("Auth provider not configured. Connect Supabase before using password recovery.");
+  },
+  async updatePassword() {
+    throw new Error("Auth provider not configured. Connect Supabase before updating the password.");
   },
 };

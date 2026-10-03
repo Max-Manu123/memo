@@ -117,6 +117,8 @@ export default function Home() {
   const [onboardingError,setOnboardingError]=useState("");
   const [trackingMethod,setTrackingMethod]=useState<TrackingMethod[]>([]);
   const [trackingPain,setTrackingPain]=useState<TrackingPain|"">("");
+  const [editingProfile,setEditingProfile]=useState(false);
+  const [profileNotice,setProfileNotice]=useState("");
   const t=copy[locale];
 
   useEffect(()=>{const recovery=typeof window!=="undefined"&&window.location.hash.includes("type=recovery"); if(recovery){setAuthActive(true);setAuthMode("resetPassword");setLandingSeen(true)} supabaseAuth.getCurrentUser().then(user=>{if(user){setAuthUserId(user.id);setAuthEmail(user.email);if(!recovery)setAuthenticated(true)}}).catch(()=>{}); const raw=localStorage.getItem("memo-demo");if(raw){try{const d=JSON.parse(raw);setOnboarded(!!d.onboarded);setLandingSeen(!!d.landingSeen);setGoal(d.goal==="lose"||d.goal==="maintain"||d.goal==="gain"?d.goal:"");setLocale(d.locale??"pt");setTheme(d.theme??"light");setProfile(d.profile??{name:"",age:"",weight:"",height:""});setTrackingMethod(Array.isArray(d.trackingMethod)?d.trackingMethod:[]);setTrackingPain(d.trackingPain==="repeat"||d.trackingPain==="search"||d.trackingPain==="manual"||d.trackingPain==="remember"||d.trackingPain==="corrections"||d.trackingPain==="speed"||d.trackingPain==="none"?d.trackingPain:"");setMeals(Array.isArray(d.meals)?d.meals:[])}catch{}}},[]);
@@ -218,6 +220,17 @@ export default function Home() {
     finally{setAuthLoading(false)}
   }
 
+
+  function saveProfileSettings(){
+    if(!validateProfile()) return;
+    setProfile(p=>({...p,name:p.name.trim().replace(/\\s+/g," ")}));
+    setEditingProfile(false);
+    setProfileNotice(locale==="pt"?"Perfil atualizado.":"Profile updated.");
+    window.setTimeout(()=>setProfileNotice(""),2600);
+    if(authenticated&&authUserId) void syncProfileToCloud(authUserId);
+  }
+
+  function setSettingsGoal(next:Goal){setGoal(next);setProfileNotice(locale==="pt"?"Objetivo atualizado.":"Goal updated.");if(authenticated&&authUserId) void syncProfileToCloud(authUserId)}
 
   function validateProfile(){
     const name=profile.name.trim().replace(/\s+/g," ");
@@ -473,7 +486,21 @@ export default function Home() {
         <div className="progress-grid"><div className="card progress-main"><div className="progress-header"><div><span className="muted-label">{t.intakeLabel}</span><h2>{formatNumber(todayCalories)} <small>/ {formatNumber(target)} kcal</small></h2></div><div className="progress-percent">{Math.min(100,Math.round(todayCalories/Math.max(1,target)*100))}%</div></div><div className="progress-track"><i style={{width:Math.min(100,Math.round(todayCalories/Math.max(1,target)*100))+"%"}}/></div><div className="progress-metrics"><div><span>{t.mealsLabel}</span><b>{todayMeals.length}</b></div><div><span>{t.protein}</span><b>{todayProtein}g</b></div><div><span>{t.fat}</span><b>{todayFat}g</b></div></div></div><div className="card progress-pattern"><span className="muted-label">{t.last7}</span><div className="progress-stat-grid"><div><strong>{averageCalories||"—"}</strong><span>{t.avgDaily}</span></div><div><strong>{activeDays}</strong><span>{t.daysActive}</span></div></div><h3>{t.topMeals}</h3>{repeated.length?<div className="repeat-list">{repeated.map(([name,count])=><div key={name}><span>{name}</span><b>{count}×</b></div>)}</div>:<p className="card-note">{t.noPattern}</p>}<button className="text-button" onClick={()=>openLogger()}>{t.addMeal}<Icon name="arrow" size={15}/></button></div></div></div>}
 
       {view==="settings" && <div className="page-wrap"><section className="welcome-row compact"><div><span className="muted-label">{t.settingsEyebrow}</span><h1>{t.settings}</h1><p>{t.settingsSubtitle}</p></div></section>
-        <div className="settings-profile card"><div className="avatar large">{avatarLetter}</div><div><span className="muted-label">{t.profile}</span><h3>{profile.name||"Memo"}</h3><p>{t.goal}: {goal==="lose"?t.lose:goal==="gain"?t.gain:t.maintain}</p></div></div><button className="plan-card" onClick={openUpgrade}><div><span className="muted-label">{t.freePlan}</span><strong>{t.upgrade}</strong><p>{t.upgradeText}</p></div><Icon name="arrow" size={19}/></button><div className="settings-list"><div className="settings-section"><span className="muted-label">{t.appearance}</span><div className="theme-options"><button className={theme==="light"?"active":""} onClick={()=>setTheme("light")}><Icon name="sun" size={16}/><span>{t.light}</span></button><button className={theme==="dark"?"active":""} onClick={()=>setTheme("dark")}><Icon name="moon" size={16}/><span>{t.dark}</span></button><button className={theme==="system"?"active":""} onClick={()=>setTheme("system")}><Icon name="monitor" size={16}/><span>{t.themeSystem}</span></button></div></div>
+        <div className="settings-profile card"><div className="avatar large">{avatarLetter}</div><div><span className="muted-label">{t.profile}</span><h3>{profile.name||"Memo"}</h3><p>{t.goal}: {goal==="lose"?t.lose:goal==="gain"?t.gain:t.maintain}</p></div><button className="secondary-button settings-edit-button" onClick={()=>{setEditingProfile(v=>!v);setOnboardingError("")}}>{editingProfile?t.cancel:t.editProfile}</button></div>
+        {profileNotice&&<div className="settings-notice"><Icon name="check" size={15}/><span>{profileNotice}</span></div>}
+        {editingProfile&&<div className="card settings-editor">
+          <div className="settings-editor-header"><div><span className="muted-label">{t.profile}</span><h3>{t.editProfile}</h3><p>{t.editProfileText}</p></div></div>
+          <div className="input-grid-rich">
+            <label><span>{t.name}<em>{t.required}</em></span><input value={profile.name} onChange={e=>{setProfile(p=>({...p,name:e.target.value}));setOnboardingError("")}} placeholder={t.namePlaceholder} autoComplete="name"/><small>{t.nameHint}</small></label>
+            <label><span>{t.age}<em>{t.optional}</em></span><input value={profile.age} onChange={e=>setProfile(p=>({...p,age:e.target.value.replace(/\D/g,"").slice(0,3)}))} placeholder={t.ageHint} inputMode="numeric" maxLength={3}/><small>{t.ageRange}</small></label>
+            <label><span>{t.weight}<em>{t.optional}</em></span><input value={profile.weight} onChange={e=>setProfile(p=>({...p,weight:e.target.value.replace(/[^0-9.]/g,"").slice(0,6)}))} placeholder={t.weightHint} inputMode="decimal"/><small>{t.weightRange}</small></label>
+            <label><span>{t.height}<em>{t.optional}</em></span><input value={profile.height} onChange={e=>setProfile(p=>({...p,height:e.target.value.replace(/\D/g,"").slice(0,3)}))} placeholder={t.heightHint} inputMode="numeric" maxLength={3}/><small>{t.heightRange}</small></label>
+          </div>
+          {onboardingError&&<div className="form-error"><Icon name="info" size={14}/><span>{onboardingError}</span></div>}
+          <button className="primary-button wide" onClick={saveProfileSettings}>{t.saveChanges}<Icon name="check" size={16}/></button>
+        </div>}
+        <div className="card settings-goal-editor"><div><span className="muted-label">{t.goal}</span><h3>{t.goalSettingsTitle}</h3></div><div className="goal-options-settings"><button className={goal==="lose"?"active":""} onClick={()=>setSettingsGoal("lose")}>{t.lose}</button><button className={goal==="maintain"?"active":""} onClick={()=>setSettingsGoal("maintain")}>{t.maintain}</button><button className={goal==="gain"?"active":""} onClick={()=>setSettingsGoal("gain")}>{t.gain}</button></div></div>
+        <button className="plan-card" onClick={openUpgrade}><div><span className="muted-label">{t.freePlan}</span><strong>{t.upgrade}</strong><p>{t.upgradeText}</p></div><Icon name="arrow" size={19}/></button><div className="settings-list"><div className="settings-section"><span className="muted-label">{t.appearance}</span><div className="theme-options"><button className={theme==="light"?"active":""} onClick={()=>setTheme("light")}><Icon name="sun" size={16}/><span>{t.light}</span></button><button className={theme==="dark"?"active":""} onClick={()=>setTheme("dark")}><Icon name="moon" size={16}/><span>{t.dark}</span></button><button className={theme==="system"?"active":""} onClick={()=>setTheme("system")}><Icon name="monitor" size={16}/><span>{t.themeSystem}</span></button></div></div>
           <div className="settings-section"><span className="muted-label">{t.language}</span><div className="theme-options language-options"><button className={locale==="pt"?"active":""} onClick={()=>setLocale("pt")}><span>PT</span><b>Português</b></button><button className={locale==="en"?"active":""} onClick={()=>setLocale("en")}><span>EN</span><b>English</b></button></div></div>
 
         </div>
